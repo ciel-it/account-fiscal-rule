@@ -21,12 +21,13 @@
 ###############################################################################
 
 from openerp.osv import fields, osv
+from openerp.exceptions import Warning
 
 
 class account_product_fiscal_classification(osv.Model):
     _name = 'account.product.fiscal.classification'
     _description = 'Product Fiscal Classification'
-
+        
     _columns = {
         'name': fields.char('Main code', size=32, required=True),
         'description': fields.char('Description', size=64),
@@ -47,6 +48,18 @@ class account_product_fiscal_classification(osv.Model):
                          domain=[('type_tax_use', '!=', 'sale')])
     }
 
+    def write(self, cr, uid, ids, values, context=None):
+        exist_company = self.browse(cr, uid, ids, context=context)
+        if exist_company and \
+            exist_company['company_id'] != values['company_id'] and \
+            uid != 1:
+        
+            raise Warning(u"Alteração não Permitida!",
+                          u"Não é permitido trocar a empresa originalmente gravada, \
+                          pois poderá afetar outros produtos")
+        else:
+            return super(account_product_fiscal_classification, self).write(cr, uid, ids, values, context=context)
+    
     def button_update_products(self, cr, uid, ids, context=None):
         result = True
         if not context:
