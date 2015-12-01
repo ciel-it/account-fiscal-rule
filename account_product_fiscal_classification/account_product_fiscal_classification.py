@@ -22,7 +22,7 @@
 
 from openerp.osv import fields, osv
 from openerp.exceptions import Warning
-
+from openerp import SUPERUSER_ID
 
 class account_product_fiscal_classification(osv.Model):
     _name = 'account.product.fiscal.classification'
@@ -50,9 +50,9 @@ class account_product_fiscal_classification(osv.Model):
 
     def write(self, cr, uid, ids, values, context=None):
         exist_company = self.browse(cr, uid, ids, context=context)
-        if exist_company and \
-            exist_company['company_id'] != values['company_id'] and \
-            uid != 1:
+        if exist_company and values \
+         and exist_company['company_id'] != values['company_id'] \
+         and uid != SUPERUSER_ID:
         
             raise Warning(u"Alteração não Permitida!",
                           u"Não é permitido trocar a empresa originalmente gravada, \
